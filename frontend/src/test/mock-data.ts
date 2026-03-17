@@ -11,21 +11,24 @@ export const mockItems = {
     id: 1,
     name: "Simple Task",
     description: "A simple task",
+    due_date: null,
     tags: [],
   },
   withDescription: {
     id: 2,
     name: "Task with Description",
     description: "This is a detailed description",
+    due_date: null,
     tags: [],
   },
   withTags: {
     id: 3,
     name: "Task with Tags",
     description: "Has multiple tags",
+    due_date: null,
     tags: [mockTags.bug, mockTags.feature],
   },
-  minimal: { id: 4, name: "Minimal", description: "", tags: [] },
+  minimal: { id: 4, name: "Minimal", description: "", due_date: null, tags: [] },
 };
 
 export function createMockItem(overrides?: Partial<Item>): Item {
@@ -33,6 +36,7 @@ export function createMockItem(overrides?: Partial<Item>): Item {
     id: Math.floor(Math.random() * 10000),
     name: "Test Task",
     description: "Test description",
+    due_date: null,
     tags: [],
     ...overrides,
   };

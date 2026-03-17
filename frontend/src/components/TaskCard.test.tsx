@@ -122,4 +122,69 @@ describe("TaskCard", () => {
     expect(taskCard).toHaveClass("rounded-lg");
     expect(taskCard).toHaveClass("cursor-grab");
   });
+
+  describe("due date indicator", () => {
+    it("does not render due date indicator when due_date is null", () => {
+      render(<TaskCard {...defaultProps} item={mockItems.simple} />);
+      expect(
+        screen.queryByTestId(`due-date-indicator-${mockItems.simple.id}`),
+      ).not.toBeInTheDocument();
+    });
+
+    it("renders due date indicator with red color when overdue", () => {
+      const overdueItem = {
+        ...mockItems.simple,
+        due_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+      render(<TaskCard {...defaultProps} item={overdueItem} />);
+      const indicator = screen.getByTestId(
+        `due-date-indicator-${overdueItem.id}`,
+      );
+      expect(indicator).toBeInTheDocument();
+      expect(indicator).toHaveClass("bg-red-100");
+      expect(indicator).toHaveClass("text-red-700");
+    });
+
+    it("renders due date indicator with orange color when due within 1 day", () => {
+      const dueSoonItem = {
+        ...mockItems.simple,
+        due_date: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
+      };
+      render(<TaskCard {...defaultProps} item={dueSoonItem} />);
+      const indicator = screen.getByTestId(
+        `due-date-indicator-${dueSoonItem.id}`,
+      );
+      expect(indicator).toBeInTheDocument();
+      expect(indicator).toHaveClass("bg-orange-100");
+      expect(indicator).toHaveClass("text-orange-700");
+    });
+
+    it("renders due date indicator with yellow color when due within 2–3 days", () => {
+      const dueSoonItem = {
+        ...mockItems.simple,
+        due_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+      render(<TaskCard {...defaultProps} item={dueSoonItem} />);
+      const indicator = screen.getByTestId(
+        `due-date-indicator-${dueSoonItem.id}`,
+      );
+      expect(indicator).toBeInTheDocument();
+      expect(indicator).toHaveClass("bg-yellow-100");
+      expect(indicator).toHaveClass("text-yellow-700");
+    });
+
+    it("renders due date indicator with green color when due in more than 3 days", () => {
+      const upcomingItem = {
+        ...mockItems.simple,
+        due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+      render(<TaskCard {...defaultProps} item={upcomingItem} />);
+      const indicator = screen.getByTestId(
+        `due-date-indicator-${upcomingItem.id}`,
+      );
+      expect(indicator).toBeInTheDocument();
+      expect(indicator).toHaveClass("bg-green-100");
+      expect(indicator).toHaveClass("text-green-700");
+    });
+  });
 });

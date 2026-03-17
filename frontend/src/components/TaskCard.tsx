@@ -8,12 +8,44 @@ interface TaskCardProps {
   onDragStart: (e: React.DragEvent<HTMLElement>, item: Item) => void;
 }
 
+type DueDateStatus = "overdue" | "due-soon-1" | "due-soon-3" | "upcoming";
+
+function getDueDateStatus(dueDateStr: string): DueDateStatus {
+  const now = new Date();
+  const dueDate = new Date(dueDateStr);
+  const diffMs = dueDate.getTime() - now.getTime();
+  const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+  if (diffDays < 0) return "overdue";
+  if (diffDays <= 1) return "due-soon-1";
+  if (diffDays <= 3) return "due-soon-3";
+  return "upcoming";
+}
+
+function formatDueDate(dueDateStr: string): string {
+  const date = new Date(dueDateStr);
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+const DUE_DATE_STYLES: Record<DueDateStatus, string> = {
+  overdue: "bg-red-100 text-red-700 border-red-300",
+  "due-soon-1": "bg-orange-100 text-orange-700 border-orange-300",
+  "due-soon-3": "bg-yellow-100 text-yellow-700 border-yellow-300",
+  upcoming: "bg-green-100 text-green-700 border-green-300",
+};
+
 export default function TaskCard({
   item,
   onDelete,
   onEdit,
   onDragStart,
 }: TaskCardProps) {
+  const dueDateStatus = item.due_date ? getDueDateStatus(item.due_date) : null;
+
   return (
     <article
       data-testid={`task-${item.id}`}
@@ -26,6 +58,14 @@ export default function TaskCard({
           <h3 className="text-sm font-medium text-slate-800">{item.name}</h3>
           {item.description && (
             <p className="mt-1 text-xs text-slate-500">{item.description}</p>
+          )}
+          {item.due_date && dueDateStatus && (
+            <span
+              data-testid={`due-date-indicator-${item.id}`}
+              className={`mt-2 inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-medium ${DUE_DATE_STYLES[dueDateStatus]}`}
+            >
+              {formatDueDate(item.due_date)}
+            </span>
           )}
           {item.tags && item.tags.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
